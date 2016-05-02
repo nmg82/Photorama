@@ -31,11 +31,12 @@ class PhotoStore {
   
   private func printResponse(response: NSURLResponse?) {
     if let response = response as? NSHTTPURLResponse {
-      print("status = \(response.statusCode) \(NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode))")
+      print("\nstatus = \(response.statusCode) \(NSHTTPURLResponse.localizedStringForStatusCode(response.statusCode))")
       print("header fields:")
       response.allHeaderFields.forEach({ (key, value) in
         print("\(key) = \(value)")
       })
+      print("\n")
     }
   }
   
@@ -48,6 +49,12 @@ class PhotoStore {
   }
   
   func fetchImageForPhoto(photo: Photo, completion: (ImageResult) -> Void) {
+    
+    if let image = photo.image {
+      completion(.Success(image))
+      return
+    }
+    
     let photoURL = photo.remoteURL
     let request = NSURLRequest(URL: photoURL)
     let task = session.dataTaskWithRequest(request) {
