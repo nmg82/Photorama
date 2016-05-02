@@ -24,9 +24,13 @@ class PhotosViewController: UIViewController {
       }
       
       NSOperationQueue.mainQueue().addOperationWithBlock({ 
-        self.collectionView.reloadSections(NSIndexSet(index: 0))
+        self.collectionView.reloadData()
       })
     }
+  }
+  
+  override func viewDidLayoutSubviews() {
+    collectionView.reloadData()
   }
   
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -61,6 +65,20 @@ extension PhotosViewController: UICollectionViewDelegate {
         }
       })
     }
+  }
+}
+
+extension PhotosViewController: UICollectionViewDelegateFlowLayout {
+  func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    
+    let numberOfColumns: CGFloat = 4
+    let viewFrameWidth = self.view.frame.width
+    let padding:CGFloat = 3
+    
+    let width = (viewFrameWidth / numberOfColumns) - padding
+    let height = width
+    
+    return CGSize(width: width, height: height)
   }
 }
 
