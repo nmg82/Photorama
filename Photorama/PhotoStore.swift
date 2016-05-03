@@ -1,4 +1,5 @@
 import UIKit
+import CoreData
 
 enum ImageResult {
   case Success(UIImage)
@@ -10,6 +11,9 @@ enum PhotoError: ErrorType {
 }
 
 class PhotoStore {
+  let coreDataStack = CoreDataStack(modelName: "Photorama")
+  let imageStore = ImageStore()
+  
   let session: NSURLSession = {
     let config = NSURLSessionConfiguration.defaultSessionConfiguration()
     return NSURLSession(configuration: config)
@@ -24,7 +28,26 @@ class PhotoStore {
       
       strongSelf.printResponse(response)
       
-      let result = strongSelf.processRecentPhotosRequest(data: data, error: error)
+      var result = strongSelf.processRecentPhotosRequest(data: data, error: error)
+      if case let .Success(photos) = result {
+        strongSelf.coreDataStack.mainQueueContext.performBlockAndWait() {
+          try! strongSelf.coreDataStack.mainQueueContext.obtainPermanentIDsForObjects(photos)
+        }
+        
+        let objectIDs = photos.map{ $0.objectID }
+        let predicate = NSPredicate(format: "self IN %@", objectIDs)
+        let sortByDateTaken = NSSortDescriptor(key: "dateTaken", ascending: true)
+        
+        do {
+          try self?.coreDataStack.saveChanges()
+          
+          let mainQueuePhotos = try strongSelf.fetchMainQueuePhotos(predicate: predicate, sortDescriptors: [sortByDateTaken])
+          result = .Success(mainQueuePhotos)
+        } catch {
+          result = .Failure(error)
+        }
+      }
+      
       completion(result)
     }
     task.resume()
@@ -46,12 +69,14 @@ class PhotoStore {
       return .Failure(error!)
     }
     
-    return FlickrAPI.photosFromJSONData(jsonData)
+    return FlickrAPI.photosFromJSONData(jsonData, inContext: coreDataStack.mainQueueContext)
   }
   
   func fetchImageForPhoto(photo: Photo, completion: (ImageResult) -> Void) {
     
-    if let image = photo.image {
+    let photoKey = photo.photoKey
+    if let image = imageStore.imageForKey(photoKey) {
+      photo.image = image
       completion(.Success(image))
       return
     }
@@ -67,6 +92,7 @@ class PhotoStore {
       let result = strongSelf.processImageRequest(data: data, error: error)
       if case let .Success(image) = result {
         photo.image = image
+        strongSelf.imageStore.setImage(image, forKey: photoKey)
       }
       
       completion(result)
@@ -84,5 +110,29 @@ class PhotoStore {
     }
     
     return .Success(image)
+  }
+  
+  func fetchMainQueuePhotos(predicate predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]? = nil) throws -> [Photo] {
+    let fetchRequest = NSFetchRequest(entityName: "Photo")
+    fetchRequest.predicate = predicate
+    fetchRequest.sortDescriptors = sortDescriptors
+    
+    let mainQueueContext = coreDataStack.mainQueueContext
+    var mainQueuePhotos: [Photo]?
+    var fetchRequestError: ErrorType?
+    
+    mainQueueContext.performBlockAndWait() {
+      do {
+        mainQueuePhotos = try mainQueueContext.executeFetchRequest(fetchRequest) as? [Photo]
+      } catch {
+        fetchRequestError = error
+      }
+    }
+    
+    guard let photos = mainQueuePhotos else {
+      throw fetchRequestError!
+    }
+    
+    return photos
   }
 }

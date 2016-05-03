@@ -16,17 +16,13 @@ class PhotosViewController: UIViewController {
       [weak self] result in
       guard let strongSelf = self else { return }
       
-      switch result {
-      case let .Success(photos):
-        strongSelf.photoDataSource.photos = photos
-      case let .Failure(error):
-        strongSelf.photoDataSource.photos.removeAll()
-        print("error fetching recent photos: \(error)")
-      }
+      let sortByDateTaken = NSSortDescriptor(key: "dateTaken", ascending: true)
+      let allPhotos = try! strongSelf.store.fetchMainQueuePhotos(sortDescriptors: [sortByDateTaken])
       
-      NSOperationQueue.mainQueue().addOperationWithBlock({ 
+      NSOperationQueue.mainQueue().addOperationWithBlock() {
+        strongSelf.photoDataSource.photos = allPhotos
         strongSelf.collectionView.reloadData()
-      })
+      }
     }
   }
   
