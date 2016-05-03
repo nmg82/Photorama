@@ -70,7 +70,7 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
     
     let numberOfColumns: CGFloat = 4
-    let viewFrameWidth = self.view.frame.width
+    let viewFrameWidth = view.frame.width
     let padding:CGFloat = 3 
     
     let width = (viewFrameWidth / numberOfColumns) - padding

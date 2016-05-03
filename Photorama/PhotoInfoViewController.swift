@@ -30,4 +30,13 @@ class PhotoInfoViewController: UIViewController {
     
     store.save()
   }
+  
+  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    if segue.identifier == "ShowTags" {
+      let navigationControler = segue.destinationViewController as! UINavigationController
+      let tagController = navigationControler.topViewController as! TagsViewController
+      tagController.store = store
+      tagController.photo = photo
+    }
+  }
 }

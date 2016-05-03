@@ -31,7 +31,7 @@ class PhotoStore {
       var result = strongSelf.processRecentPhotosRequest(data: data, error: error)
       if case let .Success(photos) = result {
         strongSelf.coreDataStack.mainQueueContext.performBlockAndWait() {
-          try! strongSelf.coreDataStack.mainQueueContext.obtainPermanentIDsForObjects(photos)
+          try! strongSelf.coreDataStack.privateQueueContext.obtainPermanentIDsForObjects(photos)
         }
         
         let objectIDs = photos.map{ $0.objectID }
@@ -39,7 +39,7 @@ class PhotoStore {
         let sortByDateTaken = NSSortDescriptor(key: "dateTaken", ascending: true)
         
         do {
-          try self?.coreDataStack.saveChanges()
+          try strongSelf.coreDataStack.saveChanges()
           
           let mainQueuePhotos = try strongSelf.fetchMainQueuePhotos(predicate: predicate, sortDescriptors: [sortByDateTaken])
           result = .Success(mainQueuePhotos)
@@ -69,7 +69,7 @@ class PhotoStore {
       return .Failure(error!)
     }
     
-    return FlickrAPI.photosFromJSONData(jsonData, inContext: coreDataStack.mainQueueContext)
+    return FlickrAPI.photosFromJSONData(jsonData, inContext: coreDataStack.privateQueueContext)
   }
   
   func fetchImageForPhoto(photo: Photo, completion: (ImageResult) -> Void) {
@@ -134,6 +134,30 @@ class PhotoStore {
     }
     
     return photos
+  }
+  
+  func fetchMainQueueTags(predicate predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]? = nil) throws -> [NSManagedObject] {
+    let fetchRequest = NSFetchRequest(entityName: "Tag")
+    fetchRequest.predicate = predicate
+    fetchRequest.sortDescriptors = sortDescriptors
+    
+    let mainQueueContext = coreDataStack.mainQueueContext
+    var mainQueueTags: [NSManagedObject]?
+    var fetchError: ErrorType?
+    
+    mainQueueContext.performBlockAndWait() {
+      do {
+        mainQueueTags = try mainQueueContext.executeFetchRequest(fetchRequest) as? [NSManagedObject]
+      } catch {
+        fetchError = error
+      }
+    }
+    
+    guard let tags = mainQueueTags else {
+      throw fetchError!
+    }
+    
+    return tags
   }
   
   func save() {

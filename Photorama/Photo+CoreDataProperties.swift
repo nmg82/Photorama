@@ -9,5 +9,6 @@ extension Photo {
     @NSManaged var remoteURL: NSURL
     @NSManaged var title: String
     @NSManaged var viewCount: Int32
-
+    @NSManaged var tags: Set<NSManagedObject>
+  
 }
