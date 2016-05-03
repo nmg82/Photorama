@@ -7,6 +7,8 @@ class PhotoInfoViewController: UIViewController {
   var photo: Photo! {
     didSet {
       navigationItem.title = photo.title
+      photo.viewCount += 1
+      navigationItem.prompt = "\(photo.viewCount) total views"
     }
   }
   
@@ -25,5 +27,7 @@ class PhotoInfoViewController: UIViewController {
         print("error fetching image for photo: \(error)")
       }
     }
+    
+    store.save()
   }
 }

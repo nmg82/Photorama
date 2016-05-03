@@ -26,7 +26,7 @@ class PhotoStore {
       [weak self] (data, response, error) in
       guard let strongSelf = self else { return }
       
-      strongSelf.printResponse(response)
+      //strongSelf.printResponse(response)
       
       var result = strongSelf.processRecentPhotosRequest(data: data, error: error)
       if case let .Success(photos) = result {
@@ -87,7 +87,7 @@ class PhotoStore {
       [weak self] (data, response, error) in
       guard let strongSelf = self else { return }
       
-      strongSelf.printResponse(response)
+      //strongSelf.printResponse(response)
       
       let result = strongSelf.processImageRequest(data: data, error: error)
       if case let .Success(image) = result {
@@ -134,5 +134,13 @@ class PhotoStore {
     }
     
     return photos
+  }
+  
+  func save() {
+    do {
+      try coreDataStack.saveChanges()
+    } catch {
+      print("error saving: \(error)")
+    }
   }
 }

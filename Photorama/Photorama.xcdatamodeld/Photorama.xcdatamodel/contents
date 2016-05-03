@@ -6,8 +6,9 @@
         <attribute name="photoKey" attributeType="String" syncable="YES"/>
         <attribute name="remoteURL" attributeType="Transformable" syncable="YES"/>
         <attribute name="title" attributeType="String" syncable="YES"/>
+        <attribute name="viewCount" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Photo" positionX="-63" positionY="-18" width="128" height="120"/>
+        <element name="Photo" positionX="-63" positionY="-18" width="128" height="135"/>
     </elements>
 </model>
