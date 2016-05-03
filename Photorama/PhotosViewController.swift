@@ -12,18 +12,32 @@ class PhotosViewController: UIViewController {
     collectionView.dataSource = photoDataSource
     collectionView.delegate = self
     
+    fetchRecentPhotos()
+  }
+  
+  private func fetchRecentPhotos() {
+    fetchPhotos()
+  }
+  
+  private func fetchFavoritePhotos() {
+    let predicate = NSPredicate(format: "favorite == true")
+    fetchPhotos(predicate: predicate)
+  }
+  
+  private func fetchPhotos(predicate predicate: NSPredicate? = nil) {
     store.fetchRecentPhotos() {
       [weak self] result in
       guard let strongSelf = self else { return }
       
       let sortByDateTaken = NSSortDescriptor(key: "dateTaken", ascending: true)
-      let allPhotos = try! strongSelf.store.fetchMainQueuePhotos(sortDescriptors: [sortByDateTaken])
+      let favoritePhotos = try! strongSelf.store.fetchMainQueuePhotos(predicate: predicate, sortDescriptors: [sortByDateTaken])
       
       NSOperationQueue.mainQueue().addOperationWithBlock() {
-        strongSelf.photoDataSource.photos = allPhotos
+        strongSelf.photoDataSource.photos = favoritePhotos
         strongSelf.collectionView.reloadData()
       }
     }
+
   }
   
   override func viewDidLayoutSubviews() {
@@ -40,6 +54,16 @@ class PhotosViewController: UIViewController {
       }
     }
   }
+  
+  @IBAction func filterPhotosControlChanged(sender: UISegmentedControl) {
+    switch sender.selectedSegmentIndex {
+    case 0:
+      fetchRecentPhotos()
+    default:
+      fetchFavoritePhotos()
+    }
+  }
+  
 }
 
 extension PhotosViewController: UICollectionViewDelegate {

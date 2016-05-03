@@ -2,6 +2,7 @@ import UIKit
 
 class PhotoInfoViewController: UIViewController {
   @IBOutlet var imageView: UIImageView!
+  @IBOutlet var favoriteButton: UIBarButtonItem!
   
   var store: PhotoStore!
   var photo: Photo! {
@@ -28,6 +29,15 @@ class PhotoInfoViewController: UIViewController {
       }
     }
     
+    if photo.favorite {
+      favoriteButton.title = "Remove Favorite"
+    } else {
+      favoriteButton.title = "Favorite"
+    }
+  }
+  
+  override func viewWillDisappear(animated: Bool) {
+    super.viewWillDisappear(animated)
     store.save()
   }
   
@@ -37,6 +47,16 @@ class PhotoInfoViewController: UIViewController {
       let tagController = navigationControler.topViewController as! TagsViewController
       tagController.store = store
       tagController.photo = photo
+    }
+  }
+  
+  @IBAction func favoriteTapped(sender: UIBarButtonItem) {
+    photo.favorite = !photo.favorite
+    
+    if photo.favorite {
+      sender.title = "Remove Favorite"
+    } else {
+      sender.title = "Favorite"
     }
   }
 }

@@ -2,6 +2,7 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10171" systemVersion="15E65" minimumToolsVersion="Xcode 7.0">
     <entity name="Photo" representedClassName=".Photo" syncable="YES">
         <attribute name="dateTaken" attributeType="Date" syncable="YES"/>
+        <attribute name="favorite" attributeType="Boolean" syncable="YES"/>
         <attribute name="photoID" attributeType="String" syncable="YES"/>
         <attribute name="photoKey" attributeType="String" syncable="YES"/>
         <attribute name="remoteURL" attributeType="Transformable" syncable="YES"/>
@@ -14,7 +15,7 @@
         <relationship name="photos" toMany="YES" deletionRule="Nullify" destinationEntity="Photo" inverseName="tags" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Photo" positionX="-63" positionY="-18" width="128" height="150"/>
+        <element name="Photo" positionX="-63" positionY="-18" width="128" height="165"/>
         <element name="Tag" positionX="-63" positionY="27" width="128" height="75"/>
     </elements>
 </model>

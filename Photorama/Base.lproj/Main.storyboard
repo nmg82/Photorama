@@ -60,12 +60,35 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9VX-og-3mq">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Quz-TH-KYI"/>
+                                    <barButtonItem style="plain" id="CMV-7u-phK">
+                                        <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="kN4-hA-wEF">
+                                            <rect key="frame" x="239" y="7" width="121" height="30"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="All"/>
+                                                <segment title="Favorites"/>
+                                            </segments>
+                                            <connections>
+                                                <action selector="filterPhotosControlChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="GQQ-N9-RBr"/>
+                                            </connections>
+                                        </segmentedControl>
+                                    </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="xQq-xu-Wlc"/>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="m6g-qj-fBk" secondAttribute="bottom" id="Gc7-DU-7QP"/>
                             <constraint firstItem="m6g-qj-fBk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Oce-J3-CnK"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="9VX-og-3mq" secondAttribute="bottom" id="QMQ-xE-K24"/>
                             <constraint firstAttribute="trailing" secondItem="m6g-qj-fBk" secondAttribute="trailing" id="QTf-ge-owT"/>
+                            <constraint firstItem="9VX-og-3mq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="SJ9-9W-dBj"/>
+                            <constraint firstAttribute="trailing" secondItem="9VX-og-3mq" secondAttribute="trailing" id="Zm7-Xl-rmB"/>
                             <constraint firstItem="m6g-qj-fBk" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="mas-z1-VuJ"/>
                         </constraints>
                     </view>
@@ -101,6 +124,12 @@
                                             <segue destination="7eV-ct-bov" kind="presentation" identifier="ShowTags" id="cD7-de-FWT"/>
                                         </connections>
                                     </barButtonItem>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="beN-gi-4RS"/>
+                                    <barButtonItem title="Favorite" id="ku6-eo-xnh">
+                                        <connections>
+                                            <action selector="favoriteTapped:" destination="SgI-4d-pep" id="ocA-Ni-0Rc"/>
+                                        </connections>
+                                    </barButtonItem>
                                 </items>
                             </toolbar>
                         </subviews>
@@ -116,6 +145,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="favoriteButton" destination="ku6-eo-xnh" id="RUW-2u-BDB"/>
                         <outlet property="imageView" destination="1Qd-YV-rEH" id="d02-lL-tLc"/>
                     </connections>
                 </viewController>
