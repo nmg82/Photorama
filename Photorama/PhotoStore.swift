@@ -19,11 +19,12 @@ class PhotoStore {
     let url = FlickrAPI.recentPhotosURL()
     let request = NSURLRequest(URL: url)
     let task = session.dataTaskWithRequest(request) {
-      [unowned self] (data, response, error) in
+      [weak self] (data, response, error) in
+      guard let strongSelf = self else { return }
       
-      self.printResponse(response)
+      strongSelf.printResponse(response)
       
-      let result = self.processRecentPhotosRequest(data: data, error: error)
+      let result = strongSelf.processRecentPhotosRequest(data: data, error: error)
       completion(result)
     }
     task.resume()
@@ -58,11 +59,12 @@ class PhotoStore {
     let photoURL = photo.remoteURL
     let request = NSURLRequest(URL: photoURL)
     let task = session.dataTaskWithRequest(request) {
-      [unowned self] (data, response, error) in
+      [weak self] (data, response, error) in
+      guard let strongSelf = self else { return }
       
-      self.printResponse(response)
+      strongSelf.printResponse(response)
       
-      let result = self.processImageRequest(data: data, error: error)
+      let result = strongSelf.processImageRequest(data: data, error: error)
       if case let .Success(image) = result {
         photo.image = image
       }

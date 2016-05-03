@@ -17,8 +17,9 @@ class PhotoInfoViewController: UIViewController {
       switch result {
       case let .Success(image):
         NSOperationQueue.mainQueue().addOperationWithBlock({ 
-          [unowned self] in
-          self.imageView.image = image
+          [weak self] in
+          guard let strongSelf = self else { return }
+          strongSelf.imageView.image = image
         })
       case let .Failure(error):
         print("error fetching image for photo: \(error)")

@@ -13,18 +13,19 @@ class PhotosViewController: UIViewController {
     collectionView.delegate = self
     
     store.fetchRecentPhotos() {
-      [unowned self] result in
+      [weak self] result in
+      guard let strongSelf = self else { return }
       
       switch result {
       case let .Success(photos):
-        self.photoDataSource.photos = photos
+        strongSelf.photoDataSource.photos = photos
       case let .Failure(error):
-        self.photoDataSource.photos.removeAll()
+        strongSelf.photoDataSource.photos.removeAll()
         print("error fetching recent photos: \(error)")
       }
       
       NSOperationQueue.mainQueue().addOperationWithBlock({ 
-        self.collectionView.reloadData()
+        strongSelf.collectionView.reloadData()
       })
     }
   }
@@ -51,16 +52,17 @@ extension PhotosViewController: UICollectionViewDelegate {
     
     //download the image data, which could take some time
     store.fetchImageForPhoto(photo) {
-      [unowned self] (result) in
+      [weak self] (result) in
+      guard let strongSelf = self else { return }
       
       NSOperationQueue.mainQueue().addOperationWithBlock({
         //the index path for the photo might have changed between 
         //the time the request started and finished, so find the most
         //recent index path
-        let photoIndex = self.photoDataSource.photos.indexOf(photo)!
+        let photoIndex = strongSelf.photoDataSource.photos.indexOf(photo)!
         let photoIndexPath = NSIndexPath(forRow: photoIndex, inSection: 0)
         
-        if let cell = self.collectionView.cellForItemAtIndexPath(photoIndexPath) as? PhotoCollectionViewCell {
+        if let cell = strongSelf.collectionView.cellForItemAtIndexPath(photoIndexPath) as? PhotoCollectionViewCell {
           cell.updateWithImage(photo.image)
         }
       })
@@ -73,7 +75,7 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
     
     let numberOfColumns: CGFloat = 4
     let viewFrameWidth = self.view.frame.width
-    let padding:CGFloat = 3
+    let padding:CGFloat = 3 
     
     let width = (viewFrameWidth / numberOfColumns) - padding
     let height = width
